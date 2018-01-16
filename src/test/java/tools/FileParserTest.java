@@ -25,7 +25,7 @@ import java.util.Collection;
 import java.util.List;
 
 /**
-* FileHandlerTest.java
+* FileParserTest.java
 *  
 * test for the class FileHandler.java
 *  
@@ -33,9 +33,9 @@ import java.util.List;
 */
 
 @RunWith(Parameterized.class)
-public class FileHandlerTest {
+public class FileParserTest {
 
-	private FileHandler fh;
+	private FileParser fp;
 	private String absolutePath;
 	private String filnameWExt;
 	private Path pathWFileName;
@@ -61,7 +61,7 @@ public class FileHandlerTest {
 	// initialization of the class and preparation for the tests
 	@Before
 	public void initialize() {
-		fh = new FileHandler();
+		fp = new FileParser();
 		absolutePath = new File("").getAbsolutePath();
 		filnameWExt = "t01.txt";
 		pathWFileName = Paths.get(absolutePath + filnameWExt);
@@ -78,7 +78,7 @@ public class FileHandlerTest {
 	@Test
 	public void testReadFile() {
 
-		String out = fh.readFile(absolutePath, filnameWExt);
+		String out = fp.readFile(absolutePath, filnameWExt);
 		String[] linesOut = out.split("\n");
 
 		for (int i = 0; i < linesIn.size(); i++) {
@@ -98,7 +98,7 @@ public class FileHandlerTest {
 			linksIn.add(linksInArr[i].trim());
 		}
 		
-		List<String> linksOut = fh.extractURLsFromFile(absolutePath, filnameWExt);
+		List<String> linksOut = fp.extractURLsFromFile(absolutePath, filnameWExt);
 		assertEquals(linksIn, linksOut);
 	}
 }

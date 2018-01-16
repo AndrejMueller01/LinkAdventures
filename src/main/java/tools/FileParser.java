@@ -12,14 +12,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
-* FileHandler.java
+* FileParser.java
 *  
-* peforms file operations
+* Performs file operations
 *  
 * @author Andrej Mueller
 */
 
-public class FileHandler {
+public class FileParser {
 
 	/** 
 	  * Reads the file
