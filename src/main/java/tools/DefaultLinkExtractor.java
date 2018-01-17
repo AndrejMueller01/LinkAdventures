@@ -1,6 +1,6 @@
 /*
  * LinkAdventures assignment from Willhaben.at
- * 16.01.2018
+ * Graz - 16.01.2018
  */
 
 package tools;
@@ -9,9 +9,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * LinkExtractor.java
+ * DefaultLinkExtractor.java
  * 
- * Performs file operations
+ * Performs link extraction from a given file.
+ * Implementation of the LinkExtractor Interface
  * 
  * @author Andrej Mueller
  */
@@ -29,8 +30,8 @@ public class DefaultLinkExtractor implements LinkExtractor<String> {
 	 */
 
 	@Override
-	public List<String> extract(String filePath, String fileNameWExt) {
-		String fileString = readFile(filePath, fileNameWExt);
+	public List<String> extract(String filePath) {
+		String fileString = readFile(filePath);
 		String[] words = fileString.split(" ");
 		return findLinksInArray(words);
 	}

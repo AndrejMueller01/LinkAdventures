@@ -85,7 +85,7 @@ public class DefaultLinkExtractorTest {
 			linksIn.add(linksInArr[i].trim());
 		}
 		
-		List<String> linksOut = le.extract(absolutePath, filnameWExt);
+		List<String> linksOut = le.extract(pathWFileName.toString());
 		
 		assertEquals(linksIn, linksOut);
 	}

@@ -49,7 +49,7 @@ public class DefaultLinkProcessorThread extends Thread implements LinkProcessor<
 	 * for threading
 	 */
 	public void run() {
-		System.out.println("Thread started with ID: " + this.getId());
+		//System.out.println("Thread started with ID: " + this.getId());
 		process(link);
 	}
 
@@ -117,6 +117,7 @@ public class DefaultLinkProcessorThread extends Thread implements LinkProcessor<
 		} catch (IOException e1) {
 			try {
 				System.err.println("Something went wrong with opening the connection. Trying again.");
+				e1.printStackTrace();
 				openConnection(link);
 			} catch (IOException e) {
 				System.err.println("Can't open connection. Shutting down.");
@@ -128,16 +129,18 @@ public class DefaultLinkProcessorThread extends Thread implements LinkProcessor<
 			dataToHash = readData();
 		} catch (IOException e) {
 			try {
-				System.err.println("Something went wrong with reading the data. Trying again.");
+				System.err.println("Something went wrong with reading the data. Trying again. Err: " + e.getMessage());
 				readData();
 			} catch (IOException e1) {
-				System.err.println("Can't read data. Shutting down.");
-				e1.printStackTrace();
+				System.err.println("Can't read data. Shutting down. Err: " + e1.getMessage());
 				return false;
 			}
 			e.printStackTrace();
 		}
-		md5(dataToHash);
+		String hash = md5(dataToHash);
+		if(hash.equals("RbwRYKKAw0uSMwmukf8oOg==") || hash.equals("5zAjHAcCDH/HsNXfEoVeMA==")) {
+			System.out.println("The response from the URL " + link + " has the hash-value: '" + hash + "'");
+		}
 		return true;
 	}
 
