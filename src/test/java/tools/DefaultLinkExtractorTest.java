@@ -25,7 +25,7 @@ import java.util.Collection;
 import java.util.List;
 
 /**
-* FileParserTest.java
+* LinkExtractorTest.java
 *  
 * test for the class FileHandler.java
 *  
@@ -33,9 +33,9 @@ import java.util.List;
 */
 
 @RunWith(Parameterized.class)
-public class FileParserTest {
+public class DefaultLinkExtractorTest {
 
-	private FileParser fp;
+	private LinkExtractor<String> le;
 	private String absolutePath;
 	private String filnameWExt;
 	private Path pathWFileName;
@@ -61,7 +61,7 @@ public class FileParserTest {
 	// initialization of the class and preparation for the tests
 	@Before
 	public void initialize() {
-		fp = new FileParser();
+		le = new DefaultLinkExtractor();
 		absolutePath = new File("").getAbsolutePath();
 		filnameWExt = "t01.txt";
 		pathWFileName = Paths.get(absolutePath + filnameWExt);
@@ -74,22 +74,9 @@ public class FileParserTest {
 		}
 	}
 
-	// test for the readFile() method
+	// test for the extract() method
 	@Test
-	public void testReadFile() {
-
-		String out = fp.readFile(absolutePath, filnameWExt);
-		String[] linesOut = out.split("\n");
-
-		for (int i = 0; i < linesIn.size(); i++) {
-			assertEquals(linesIn.get(i).trim(), linesOut[i].trim());
-		}
-	}
-
-	// test of the ectractURLsFromFile method
-	@Test
-	public void testExtractURLsFromFile() {
-
+	public void testExtract() {
 		String[] linksInArr = linkString.split("\n");	
 		List<String> linksIn = new ArrayList<>();
 		
@@ -98,7 +85,8 @@ public class FileParserTest {
 			linksIn.add(linksInArr[i].trim());
 		}
 		
-		List<String> linksOut = fp.extractURLsFromFile(absolutePath, filnameWExt);
+		List<String> linksOut = le.extract(absolutePath, filnameWExt);
+		
 		assertEquals(linksIn, linksOut);
 	}
 }

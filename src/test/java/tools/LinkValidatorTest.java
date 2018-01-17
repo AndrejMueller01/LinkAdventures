@@ -17,9 +17,9 @@ import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
 
 /**
- * FileParserTest.java
+ * LinkValidatorTest.java
  * 
- * test for the class FileHandler.java
+ * test for the class LinkValidator.java
  * 
  * @author Andrej Mueller
  */
@@ -27,7 +27,7 @@ import org.junit.runners.Parameterized.Parameters;
 @RunWith(Parameterized.class)
 public class LinkValidatorTest {
 
-	private LinkValidator lv;
+	private DefaultLinkValidator lv;
 
 	// parameters for the test run
 	@Parameter
@@ -46,7 +46,7 @@ public class LinkValidatorTest {
 
 	@Before
 	public void initialize() {
-		lv = new LinkValidator();
+		lv = new DefaultLinkValidator();
 	}
 
 	@Test
