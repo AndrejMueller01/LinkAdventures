@@ -4,12 +4,12 @@
  */
 package tools;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
@@ -28,17 +28,13 @@ public class DefaultLinkProcessorThread extends Thread implements LinkProcessor<
 	public String link;
 	public String[] hashesToCompare;
 
-	// Default Constructor
-	public DefaultLinkProcessorThread() {
-		
-	}
 	// Constructor
 	public DefaultLinkProcessorThread(String link, String[] hashesToCompare) {
 		super("DefaultLinkProcessor");
 		this.link = link;
-		if(	hashesToCompare != null) {
+		if (hashesToCompare != null) {
 			this.hashesToCompare = hashesToCompare;
-		}else {
+		} else {
 			this.hashesToCompare = new String[2];
 			this.hashesToCompare[0] = "RbwRYKKAw0uSMwmukf8oOg==";
 			this.hashesToCompare[1] = "5zAjHAcCDH/HsNXfEoVeMA==";
@@ -66,28 +62,29 @@ public class DefaultLinkProcessorThread extends Thread implements LinkProcessor<
 	}
 
 	/**
-	 * reads the data from a HTTP connection
+	 * reads the data from a HTTP connection and computes the MD5 hash
 	 * 
-	 * @return byte[], the data from the HTTP reply
+	 * @return String, the hash
 	 */
-	private byte[] readData() throws IOException {
+	private String computeHashFromHTTPResponse() throws IOException {
 
-		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		InputStream is = null;
-		// int bytesRead = 0;
-
-		is = connection.getInputStream();
-		byte[] byteChunk = new byte[10000]; // 10kB
-		int n;
-		while ((n = is.read(byteChunk)) > 0) {
-			baos.write(byteChunk, 0, n);
-			// bytesRead += n;
+		InputStream is = connection.getInputStream();
+		DigestInputStream dis = null;
+		
+		try {
+			dis = new DigestInputStream(is, MessageDigest.getInstance("MD5"));
+		} catch (NoSuchAlgorithmException e) {
+			System.err.println("Error: " + e.getMessage());
+			e.printStackTrace();
 		}
-		// System.out.println(link + " - MD5: " + md5(baos.toByteArray()) + " size: " +
-		// baos.size());
+		
+		byte[] buffer = new byte[10000];
+		while (dis.read(buffer) != -1);
+		
+		dis.close();
 		is.close();
 
-		return baos.toByteArray();
+		return Base64.getEncoder().encodeToString(dis.getMessageDigest().digest());
 	}
 
 	/**
@@ -97,7 +94,7 @@ public class DefaultLinkProcessorThread extends Thread implements LinkProcessor<
 	 *            data for hashing
 	 * @return byte[], the hash base64 encoded
 	 */
-	private String md5(byte[] data) {
+	/*private String md5(byte[] data) {
 		MessageDigest md = null;
 		try {
 			md = MessageDigest.getInstance("MD5");
@@ -108,7 +105,7 @@ public class DefaultLinkProcessorThread extends Thread implements LinkProcessor<
 		md.reset();
 		md.update(data);
 		return Base64.getEncoder().encodeToString(md.digest());
-	}
+	}*/
 
 	/**
 	 * implementation of the link processing
@@ -121,7 +118,7 @@ public class DefaultLinkProcessorThread extends Thread implements LinkProcessor<
 	 */
 	@Override
 	public String process(String linkString) {
-		byte[] dataToHash = null;
+		String hash = null;
 
 		try {
 			openConnection(linkString);
@@ -140,20 +137,19 @@ public class DefaultLinkProcessorThread extends Thread implements LinkProcessor<
 			}
 		}
 		try {
-			dataToHash = readData();
+			hash = computeHashFromHTTPResponse();
 		} catch (IOException e) {
 			try {
-				System.err.println("Something went wrong with reading the data from " + linkString + ". Trying again. Err: "
-						+ e.getMessage());
-				readData();
+				System.err.println("Something went wrong with reading the data from " + linkString
+						+ ". Trying again. Err: " + e.getMessage());
+				hash = computeHashFromHTTPResponse();
 			} catch (IOException e1) {
-				System.err.println("Can't read data from "+ linkString + ". Shutting down. Err: " + e1.getMessage());
+				System.err.println("Can't read data from " + linkString + ". Shutting down. Err: " + e1.getMessage());
 				return null;
 			}
 			e.printStackTrace();
 		}
-		String hash = md5(dataToHash);
-		for(int i = 0; i < hashesToCompare.length; i++) {
+		for (int i = 0; i < hashesToCompare.length; i++) {
 			if (hashesToCompare[i].equals(hash))
 				System.out.println("The response of " + linkString + " has the hash-value '" + hash + "'");
 		}
