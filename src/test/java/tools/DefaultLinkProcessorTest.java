@@ -1,6 +1,6 @@
 /*
  * LinkAdventures assignment from Willhaben.at
- * 16.01.2018
+ * Graz - 18.01.2018
  */
 package tools;
 
@@ -17,40 +17,36 @@ import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
 
 /**
- * LinkValidatorTest.java
+ * DefaultLinkProcessorTest.java
  * 
- * test for the class LinkValidator.java
+ * test for the class DefaultLinkProcessorThread.java
  * 
  * @author Andrej Mueller
  */
-
 @RunWith(Parameterized.class)
-public class LinkValidatorTest {
-
-	private DefaultLinkValidator lv;
+public class DefaultLinkProcessorTest {
+	private DefaultLinkProcessorThread lp;
 
 	// parameters for the test run
 	@Parameter
 	public String linkString;
 	@Parameter(1)
-	public boolean isValid;
+	public String hashString;
 
 	// parameter values for the test runs
 	@Parameters
 	public static Collection<Object[]> data() {
-		return Arrays.asList(new Object[][] { { "https://www.test.at", true }, { "http://www.test.at#", false },
-				{ "http://foo.com/blah_blah_(wikipedia)", true }, { "https://me:secret@test.com/wh-assessment-101/invalid.txt", false },
-				{ "https://test.com/wh/fragment#invalid", false }, { "https://test.com/wh-101/query?invalid=true", false },
-				{ "https://test.com:8080/wh-101", false }});
+		return Arrays.asList(new Object[][] { { "https://tools.ietf.org/rfc/rfc3986.txt", "RbwRYKKAw0uSMwmukf8oOg==" },
+				{ "https://www.ietf.org/rfc/rfc1149.txt", "5zAjHAcCDH/HsNXfEoVeMA==" } });
 	}
 
 	@Before
 	public void initialize() {
-		lv = new DefaultLinkValidator();
+		lp = new DefaultLinkProcessorThread(linkString, null);
 	}
 
 	@Test
-	public void testTest() {
-		assertEquals(lv.test(linkString), isValid);
+	public void testProcess() {
+		assertEquals(lp.process(linkString), hashString);
 	}
 }

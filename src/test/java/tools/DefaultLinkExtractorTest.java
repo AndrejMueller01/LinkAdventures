@@ -25,9 +25,9 @@ import java.util.Collection;
 import java.util.List;
 
 /**
-* LinkExtractorTest.java
+* DefaultLinkExtractorTest.java
 *  
-* test for the class FileHandler.java
+* test for the class DefaultLinkExtractor.java
 *  
 * @author Andrej Mueller
 */

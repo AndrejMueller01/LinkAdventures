@@ -22,15 +22,27 @@ import java.util.Base64;
  * 
  * @author Andrej Mueller
  */
-public class DefaultLinkProcessorThread extends Thread implements LinkProcessor<String> {
+public class DefaultLinkProcessorThread extends Thread implements LinkProcessor<String, String> {
 
 	public URLConnection connection;
 	public String link;
+	public String[] hashesToCompare;
 
+	// Default Constructor
+	public DefaultLinkProcessorThread() {
+		
+	}
 	// Constructor
-	public DefaultLinkProcessorThread(String link) {
+	public DefaultLinkProcessorThread(String link, String[] hashesToCompare) {
 		super("DefaultLinkProcessor");
 		this.link = link;
+		if(	hashesToCompare != null) {
+			this.hashesToCompare = hashesToCompare;
+		}else {
+			this.hashesToCompare = new String[2];
+			this.hashesToCompare[0] = "RbwRYKKAw0uSMwmukf8oOg==";
+			this.hashesToCompare[1] = "5zAjHAcCDH/HsNXfEoVeMA==";
+		}
 	}
 
 	/**
@@ -39,7 +51,7 @@ public class DefaultLinkProcessorThread extends Thread implements LinkProcessor<
 	 * @param linkString,
 	 *            the URL for the connection
 	 */
-	public void openConnection(String linkString) throws MalformedURLException, IOException {
+	private void openConnection(String linkString) throws MalformedURLException, IOException {
 		URL link;
 		link = new URL(linkString);
 		connection = link.openConnection();
@@ -49,7 +61,7 @@ public class DefaultLinkProcessorThread extends Thread implements LinkProcessor<
 	 * for threading
 	 */
 	public void run() {
-		//System.out.println("Thread started with ID: " + this.getId());
+		// System.out.println("Thread started with ID: " + this.getId());
 		process(link);
 	}
 
@@ -58,18 +70,18 @@ public class DefaultLinkProcessorThread extends Thread implements LinkProcessor<
 	 * 
 	 * @return byte[], the data from the HTTP reply
 	 */
-	public byte[] readData() throws IOException {
+	private byte[] readData() throws IOException {
 
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		InputStream is = null;
-		int bytesRead = 0;
+		// int bytesRead = 0;
 
 		is = connection.getInputStream();
 		byte[] byteChunk = new byte[10000]; // 10kB
 		int n;
 		while ((n = is.read(byteChunk)) > 0) {
 			baos.write(byteChunk, 0, n);
-			bytesRead += n;
+			// bytesRead += n;
 		}
 		// System.out.println(link + " - MD5: " + md5(baos.toByteArray()) + " size: " +
 		// baos.size());
@@ -81,7 +93,8 @@ public class DefaultLinkProcessorThread extends Thread implements LinkProcessor<
 	/**
 	 * calculates md5 hash
 	 * 
-	 * @param byte[], data for hashing
+	 * @param byte[],
+	 *            data for hashing
 	 * @return byte[], the hash base64 encoded
 	 */
 	private String md5(byte[] data) {
@@ -102,46 +115,49 @@ public class DefaultLinkProcessorThread extends Thread implements LinkProcessor<
 	 * 
 	 * usually open, read, hash
 	 * 
-	 * @param String, the link for processing purposes
+	 * @param String,
+	 *            the link for processing purposes
 	 * @return boolean, false in case of an error.
 	 */
 	@Override
-	public boolean process(String link) {
+	public String process(String linkString) {
 		byte[] dataToHash = null;
 
 		try {
-			openConnection(link);
+			openConnection(linkString);
 		} catch (MalformedURLException e) {
-			System.err.println("The url you've entered is invalid! " + link);
+			System.err.println("The url you've entered is invalid! " + linkString);
 			e.printStackTrace();
 		} catch (IOException e1) {
 			try {
 				System.err.println("Something went wrong with opening the connection. Trying again.");
 				e1.printStackTrace();
-				openConnection(link);
+				openConnection(linkString);
 			} catch (IOException e) {
 				System.err.println("Can't open connection. Shutting down.");
 				e.printStackTrace();
-				return false;
+				return null;
 			}
 		}
 		try {
 			dataToHash = readData();
 		} catch (IOException e) {
 			try {
-				System.err.println("Something went wrong with reading the data. Trying again. Err: " + e.getMessage());
+				System.err.println("Something went wrong with reading the data from " + linkString + ". Trying again. Err: "
+						+ e.getMessage());
 				readData();
 			} catch (IOException e1) {
-				System.err.println("Can't read data. Shutting down. Err: " + e1.getMessage());
-				return false;
+				System.err.println("Can't read data from "+ linkString + ". Shutting down. Err: " + e1.getMessage());
+				return null;
 			}
 			e.printStackTrace();
 		}
 		String hash = md5(dataToHash);
-		if(hash.equals("RbwRYKKAw0uSMwmukf8oOg==") || hash.equals("5zAjHAcCDH/HsNXfEoVeMA==")) {
-			System.out.println("The response from the URL " + link + " has the hash-value: '" + hash + "'");
+		for(int i = 0; i < hashesToCompare.length; i++) {
+			if (hashesToCompare[i].equals(hash))
+				System.out.println("The response of " + linkString + " has the hash-value '" + hash + "'");
 		}
-		return true;
+		return hash;
 	}
 
 }
