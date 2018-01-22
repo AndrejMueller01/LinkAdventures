@@ -15,14 +15,14 @@ import java.util.function.Predicate;
  * 
  * @author Andrej Mueller
  */
-public class DefaultLinkValidator implements Predicate<String>{
-	
+public class DefaultLinkValidator implements Predicate<String> {
+
 	@Override
 	public boolean test(String link) {
 		String regex = "http(s)?:\\/\\/[a-zA-Z0-9_-]+\\.[a-zA-Z0-9_.-]+[a-zA-Z0-9_\\/()-.%]*";
 
-		if(link.toString().matches(regex))
+		if (link.toString().matches(regex))
 			return true;
-		return false;	
+		return false;
 	}
 }

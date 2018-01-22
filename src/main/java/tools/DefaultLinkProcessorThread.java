@@ -35,6 +35,7 @@ public class DefaultLinkProcessorThread extends Thread implements LinkProcessor<
 		if (hashesToCompare != null) {
 			this.hashesToCompare = hashesToCompare;
 		} else {
+			// if there is no hash parameter in cl arguments
 			this.hashesToCompare = new String[2];
 			this.hashesToCompare[0] = "RbwRYKKAw0uSMwmukf8oOg==";
 			this.hashesToCompare[1] = "5zAjHAcCDH/HsNXfEoVeMA==";
@@ -66,7 +67,7 @@ public class DefaultLinkProcessorThread extends Thread implements LinkProcessor<
 	 * 
 	 * @return String, the hash
 	 */
-	private String computeHashFromHTTPResponse() throws IOException {
+	private String computeHashOfHTTPResponse() throws IOException {
 
 		InputStream is = connection.getInputStream();
 		DigestInputStream dis = null;
@@ -137,12 +138,12 @@ public class DefaultLinkProcessorThread extends Thread implements LinkProcessor<
 			}
 		}
 		try {
-			hash = computeHashFromHTTPResponse();
+			hash = computeHashOfHTTPResponse();
 		} catch (IOException e) {
 			try {
 				System.err.println("Something went wrong with reading the data from " + linkString
 						+ ". Trying again. Err: " + e.getMessage());
-				hash = computeHashFromHTTPResponse();
+				hash = computeHashOfHTTPResponse();
 			} catch (IOException e1) {
 				System.err.println("Can't read data from " + linkString + ". Shutting down. Err: " + e1.getMessage());
 				return null;

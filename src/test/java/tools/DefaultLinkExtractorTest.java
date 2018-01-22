@@ -25,12 +25,12 @@ import java.util.Collection;
 import java.util.List;
 
 /**
-* DefaultLinkExtractorTest.java
-*  
-* test for the class DefaultLinkExtractor.java
-*  
-* @author Andrej Mueller
-*/
+ * DefaultLinkExtractorTest.java
+ * 
+ * test for the class DefaultLinkExtractor.java
+ * 
+ * @author Andrej Mueller
+ */
 
 @RunWith(Parameterized.class)
 public class DefaultLinkExtractorTest {
@@ -41,7 +41,7 @@ public class DefaultLinkExtractorTest {
 	private Path pathWFileName;
 	private List<String> linesIn;
 
-	//parameters for the test run
+	// parameters for the test run
 	@Parameter
 	public String fileString;
 	@Parameter(1)
@@ -55,7 +55,7 @@ public class DefaultLinkExtractorTest {
 				{ "The first line \n The second line \n some link: http://www.test.tt)) \n https://holalala",
 						"http://www.test.tt \n https://holalala" },
 				{ "The first {http://www./te+&@#/%?=~\\-_|!:,.;line \n The second line \n some link: http://www.test.tt)) \n https://holalala",
-				"http://www./te+&@#/%?=~\\-_|!:,.;line \n http://www.test.tt \n https://holalala" }});
+						"http://www./te+&@#/%?=~\\-_|!:,.;line \n http://www.test.tt \n https://holalala" } });
 	}
 
 	// initialization of the class and preparation for the tests
@@ -77,16 +77,15 @@ public class DefaultLinkExtractorTest {
 	// test for the extract() method
 	@Test
 	public void testExtract() {
-		String[] linksInArr = linkString.split("\n");	
+		String[] linksInArr = linkString.split("\n");
 		List<String> linksIn = new ArrayList<>();
-		
-		for(int i = 0; i< linksInArr.length; i++) 
-		{
+
+		for (int i = 0; i < linksInArr.length; i++) {
 			linksIn.add(linksInArr[i].trim());
 		}
-		
+
 		List<String> linksOut = le.extract(pathWFileName.toString());
-		
+
 		assertEquals(linksIn, linksOut);
 	}
 }
